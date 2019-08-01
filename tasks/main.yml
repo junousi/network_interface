@@ -12,15 +12,11 @@
 - name: Install the required  packages in Redhat derivatives
   yum:
     name: "{{ network_pkgs }}"
-  vars:
-     packages:  "{{ network_pkgs }}"
   when: ansible_os_family == 'RedHat' and network_check_packages
 
 - name: Install the required packages in Debian derivatives
   apt:
     name: "{{ network_pkgs }}"
-  vars:
-     packages:  "{{ network_pkgs }}"
   environment: env
   when: ansible_os_family == 'Debian'
 
