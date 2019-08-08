@@ -40,10 +40,6 @@ function show_version() {
 
 echo "TEST: show versions"
 ansible --version
-id
-systemctl --no-pager
-proc1comm=$(cat /proc/1/comm)
-echo "TEST: proc1s comm is $proc1comm"
 
 }
 
@@ -130,7 +126,7 @@ set -e
 function main(){
 #    install_os_deps
 #    install_ansible_devel
-#    show_version
+    show_version
 #    tree_list
 #    test_install_requirements
     test_ansible_setup
