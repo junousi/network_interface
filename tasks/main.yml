@@ -110,6 +110,24 @@
   notify:
    - restart network
 
+- name: Add vlan interfaces manually if network_vlan_ephemeral is True
+  command: "ip link add link {{ item.device.split('.')[0] }} name {{ item.device }} type vlan id {{ item.device.split('.')[1] }}"
+  args:
+    creates: "/sys/devices/virtual/net/{{ item.device }}"
+  with_items: "{{ network_vlan_interfaces }}"
+  when: network_vlan_interfaces is defined and ansible_os_family == 'RedHat' and network_vlan_ephemeral
+  register: reg_network_vlan
+  failed_when: reg_network_vlan.rc|int != 0 and reg_network_vlan.rc|int != 2
+  changed_when: reg_network_vlan.rc|int == 0
+
+- name: Set MTU manually on vlan interfaces if network_vlan_ephemeral is True and the interface parameters include mtu
+  command: "ip link set mtu {{ item.mtu }} {{ item.device }}"
+  with_items: "{{ network_vlan_interfaces }}"
+  when: network_vlan_interfaces is defined and ansible_os_family == 'RedHat' and network_vlan_ephemeral and item.mtu is defined
+  register: reg_network_vlan
+  failed_when: reg_network_vlan.rc|int != 0 and reg_network_vlan.rc|int != 2
+  changed_when: reg_network_vlan.rc|int == 0
+
 - name: Write configuration files for rhel route configuration with vlan
   template: src=route_{{ ansible_os_family }}.j2 dest={{ net_path }}/route-{{ item.device }}
   with_items: "{{ network_vlan_interfaces }}"
@@ -132,6 +150,26 @@
   register: bridge_result
   notify:
    - restart network
+
+- name: Add bridges manually if network_bridge_ephemeral is True
+  command: "brctl addbr {{ item.device }}"
+  args:
+    creates: "/sys/devices/virtual/net/{{ item.device }}"
+  with_items: "{{ network_bridge_interfaces }}"
+  when: network_bridge_interfaces is defined and ansible_os_family == 'RedHat' and network_bridge_ephemeral
+  register: reg_network_bridge
+  failed_when: reg_network_bridge.rc|int != 0 and reg_network_bridge.rc|int != 2
+  changed_when: reg_network_bridge.rc|int == 0
+
+- name: Plug VLAN interfaces to bridges manually if network_bridge_ephemeral and network_vlan_ephemeral are True
+  command: "brctl addif {{ item.bridge }} {{ item.device }}"
+  args:
+    creates: "/sys/devices/virtual/net/{{ item.bridge }}/lower_{{ item.device }}"
+  with_items: "{{ network_vlan_interfaces }}"
+  when: network_bridge_interfaces is defined and ansible_os_family == 'RedHat' and network_bridge_ephemeral and network_vlan_ephemeral
+  register: reg_network_bridge_vlan
+  failed_when: reg_network_bridge_vlan.rc|int != 0 and reg_network_bridge_vlan.rc|int != 2
+  changed_when: reg_network_bridge_vlan.rc|int == 0
 
 - name: Write configuration files for rhel route configuration
   template: src=route_{{ ansible_os_family }}.j2 dest={{ net_path }}/route-{{ item.device }}
