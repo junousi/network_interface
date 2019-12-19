@@ -120,10 +120,10 @@
   failed_when: reg_network_vlan.rc|int != 0 and reg_network_vlan.rc|int != 2
   changed_when: reg_network_vlan.rc|int == 0
 
-- name: Add vlan interface IP address manually if network_vlan_ephemeral is True
+- name: Add vlan interface IP address manually if network_vlan_ephemeral is True and the interface parameters include address
   command: "ip addr add {{ item.address }}/{{ item.netmask }} dev {{ item.device }}"
   with_items: "{{ network_vlan_interfaces }}"
-  when: network_vlan_interfaces is defined and ansible_os_family == 'RedHat' and network_vlan_ephemeral
+  when: network_vlan_interfaces is defined and ansible_os_family == 'RedHat' and network_vlan_ephemeral and item.address is defined
   register: reg_network_vlan
   failed_when: reg_network_vlan.rc|int != 0 and reg_network_vlan.rc|int != 2
   changed_when: reg_network_vlan.rc|int == 0
