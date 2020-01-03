@@ -21,7 +21,7 @@ BRIDGE={{ item.bridge }}
 {% endif %}
 {% endif %}
 
-{% if item.bootproto == 'dhcp' %}
+{%- if item.bootproto == 'dhcp' -%}
 DEVICE={{ item.device }}
 BOOTPROTO=dhcp
 {% endif %}
