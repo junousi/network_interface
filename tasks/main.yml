@@ -177,6 +177,14 @@
   failed_when: reg_network_bridge.rc|int != 0 and reg_network_bridge.rc|int != 2
   changed_when: reg_network_bridge.rc|int == 0
 
+- name: Ensure bridge interface is up if network_bridge_ephemeral is True
+  command: "ip link set up {{ item.device }}"
+  with_items: "{{ network_bridge_interfaces }}"
+  when: network_bridge_interfaces is defined and ansible_os_family == 'RedHat' and network_bridge_ephemeral
+  register: reg_network_bridge
+  failed_when: reg_network_bridge.rc|int != 0 and reg_network_bridge.rc|int != 2
+  changed_when: reg_network_bridge.rc|int == 0
+
 - name: Plug VLAN interfaces to bridges manually if network_bridge_ephemeral and network_vlan_ephemeral are True
   command: "brctl addif {{ item.bridge }} {{ item.device }}"
   args:
