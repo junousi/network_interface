@@ -209,3 +209,6 @@
   register: reg_network_iproute
   failed_when: reg_network_iproute.rc|int != 0 and reg_network_iproute.rc|int != 2
   changed_when: reg_network_iproute.rc|int == 0
+
+- name: Make sure that are handlers are done before ending the role
+  meta: flush_handlers
