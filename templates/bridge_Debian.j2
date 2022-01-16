@@ -10,9 +10,8 @@ netmask {{ item.netmask }}
 {% if item.gateway is defined %}
 gateway {{ item.gateway }}
 {% endif %}
-{% if item.ports is defined %}
-bridge_ports {{ item.ports|join(' ') }}
-{% endif %}
+bridge_ports{% for iface in network_ether_interfaces if iface.bridge|default(None) == item.device %}{{ ' ' ~ iface.device }}{% else %}none{% endfor %}
+
 {% if item.stp is defined %}
 bridge_stp {{ item.stp }}
 {% endif %}
