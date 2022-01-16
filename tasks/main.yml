@@ -1,8 +1,8 @@
 ---
-- name: Check if the bridge ports are still defined using the old way for Redhat derivatives
+- name: Check if the bridge ports are still defined using the old way
   fail:
     msg: "Ports shouldn't be defined this way."
-  when: item.ports is defined and ansible_os_family == 'RedHat'
+  when: item.ports is defined
   with_items:
     - "{{ network_bridge_interfaces }}"
 
