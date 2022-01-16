@@ -6,3 +6,5 @@ network_pkgs:
   - ifenslave
 
 net_path: "/etc/network/interfaces.d"
+
+systemd_network_service_name: "networking"

@@ -5,3 +5,5 @@ network_pkgs:
   - iputils
 
 net_path: "/etc/sysconfig/network-scripts"
+
+systemd_network_service_name: "network"
